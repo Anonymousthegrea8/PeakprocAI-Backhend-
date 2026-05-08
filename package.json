@@ -1,0 +1,12 @@
+{
+  "name": "peakprocai-backend",
+  "version": "1.0.0",
+  "description": "PeakProCAI Connector OS Backend — proxies API calls for all three connectors",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}

@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Carty Visuals — Connector OS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--accent:#e85d26;--accent-lo:rgba(232,93,38,.1);--accent-rgb:232,93,38}
+.brand-av{background:linear-gradient(135deg,#e85d26,#8a2800)}
+.brand-name span{color:#c9a84c}
+.badge{background:rgba(201,168,76,.09);border:1px solid rgba(201,168,76,.3);color:#c9a84c}
+.step-tab.active .step-num{border-color:#c9a84c;color:#c9a84c;background:rgba(201,168,76,.09)}
+.step-tab.active .step-label{color:var(--text)}
+.type-btn.selected{background:rgba(201,168,76,.09);outline:1px solid #c9a84c}
+.type-btn-label{color:#c9a84c}
+.progress-fill.p2{background:#c9a84c}
+
+:root{--bg:#09090b;--bg2:#0f0f12;--surface:#141418;--border:#1f1f26;--border2:#2a2a34;--text:#e6e1d6;--muted:#62605a;--muted2:#3a3835;--gold:#c9a84c;--gold-lo:rgba(201,168,76,.09);--green-lo:rgba(26,107,58,.12);--blue-lo:rgba(96,165,250,.08);--serif:"DM Serif Display",Georgia,serif;--sans:"Syne",sans-serif;--mono:"DM Mono",monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:1rem 2.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:1rem}
+.brand{display:flex;align-items:center;gap:.7rem;text-decoration:none}
+.brand-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:.9rem;color:white;font-style:italic;flex-shrink:0}
+.brand-name{font-family:var(--serif);font-size:.9rem;color:var(--text)}
+.badge{font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;padding:.25rem .7rem}
+.main{max-width:1100px;margin:0 auto;padding:2.5rem}
+.steps-header{display:flex;border:1px solid var(--border);margin-bottom:2rem;overflow-x:auto}
+.step-tab{flex:1;min-width:90px;padding:.9rem 1rem;display:flex;align-items:center;gap:.6rem;cursor:pointer;transition:background .2s;background:var(--bg2);border:none;color:var(--text);border-right:1px solid var(--border)}
+.step-tab:last-child{border-right:none}
+.step-tab.active{background:var(--surface)}
+.step-tab.done{background:var(--green-lo)}
+.step-num{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.6rem;color:var(--muted);flex-shrink:0;transition:all .2s}
+.step-tab.done .step-num{border-color:#4ade80;color:#4ade80;background:var(--green-lo)}
+.step-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.step-tab.active .step-label{color:var(--text)}
+.step-tab.done .step-label{color:#4ade80}
+.panel{display:none}.panel.active{display:block}
+.section-head{display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem}
+.section-title{font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.section-line{flex:1;height:1px;background:var(--border)}
+.card{border:1px solid var(--border);background:var(--surface);padding:1.8rem;margin-bottom:1.2rem}
+.card-title{font-family:var(--serif);font-size:1.1rem;margin-bottom:.5rem}
+.card-desc{font-size:.8rem;color:var(--muted);line-height:1.7;margin-bottom:1.2rem}
+.upload-zone{border:2px dashed var(--border2);padding:3rem 2rem;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent,var(--gold));background:var(--accent-lo,var(--gold-lo))}
+.upload-icon{font-size:2rem;margin-bottom:.8rem;opacity:.5}
+.upload-title{font-family:var(--serif);font-size:1.1rem;margin-bottom:.4rem}
+.upload-desc{font-size:.78rem;color:var(--muted)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.field-group{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem}
+.field-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.field-input{background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:.82rem;padding:.7rem 1rem;outline:none;transition:border-color .2s;width:100%}
+.field-input:focus{border-color:var(--accent,var(--gold))}
+.field-input::placeholder{color:var(--muted2)}
+select.field-input{cursor:pointer}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.btn{font-family:var(--mono);font-size:.68rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:.8rem 1.8rem;border:none;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.5rem}
+.btn-primary{background:var(--accent,var(--gold));color:var(--bg)}.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-ghost{background:none;border:1px solid var(--border2);color:var(--muted)}.btn-ghost:hover{border-color:var(--muted);color:var(--text)}
+.btn-green{background:#16a34a;color:white}.btn-green:hover{background:#15803d}
+.btn-instantly{background:#6366f1;color:white}.btn-instantly:hover{background:#4f46e5}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.table-wrap{overflow-x:auto;border:1px solid var(--border)}
+.data-table{width:100%;border-collapse:collapse;font-size:.75rem}
+.data-table th{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:.6rem 1rem;text-align:left;border-bottom:1px solid var(--border);background:var(--bg2);white-space:nowrap}
+.data-table td{padding:.6rem 1rem;border-bottom:1px solid var(--border);color:var(--muted);vertical-align:top;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.data-table tr:hover td{background:var(--surface);color:var(--text)}
+.data-table td.hi{color:var(--accent,var(--gold));font-style:italic;white-space:normal;max-width:300px}
+.data-table td.blue{color:#60a5fa;max-width:250px;white-space:normal;font-size:.7rem}
+.data-table td.ok{color:#4ade80}.data-table td.err{color:#f87171}.data-table td.pushed{color:#6366f1}
+.progress-wrap{background:var(--bg);border:1px solid var(--border);height:6px;border-radius:3px;overflow:hidden;margin:.8rem 0}
+.progress-fill{height:100%;border-radius:3px;transition:width .4s ease;background:var(--accent,var(--gold))}
+.progress-stats{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.62rem;color:var(--muted)}
+.log{background:var(--bg);border:1px solid var(--border);padding:1rem;height:180px;overflow-y:auto;font-family:var(--mono);font-size:.7rem;line-height:1.8}
+.log .l{color:var(--muted)}.log .li{color:var(--text)}.log .ls{color:#4ade80}.log .lw{color:var(--gold)}.log .le{color:#f87171}.log .la{color:#60a5fa}.log .lin{color:#6366f1}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;border:1px solid var(--border);background:var(--border);margin-bottom:1.2rem}
+.stat-box{background:var(--surface);padding:1.2rem;display:flex;flex-direction:column;gap:.3rem}
+.stat-val{font-family:var(--serif);font-size:1.6rem;line-height:1;color:var(--text)}
+.stat-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.info-box{border:1px solid rgba(201,168,76,.2);background:var(--gold-lo);padding:1rem 1.2rem;margin-bottom:1rem;font-size:.78rem;color:var(--muted);line-height:1.7}
+.info-box strong{color:var(--text)}
+.accent-box{border:1px solid rgba(var(--accent-rgb,232,93,38),.2);background:var(--accent-lo,var(--gold-lo));padding:1rem 1.2rem;margin-bottom:1rem;font-size:.78rem;color:var(--muted);line-height:1.7}
+.apify-box{background:var(--blue-lo);border:1px solid rgba(96,165,250,.2);padding:1rem 1.2rem;margin-bottom:1rem;font-size:.78rem;color:var(--muted);line-height:1.7}
+.apify-box strong{color:#60a5fa}
+.instantly-box{background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.2);padding:1rem 1.2rem;margin-bottom:1rem;font-size:.78rem;color:var(--muted);line-height:1.7}
+.instantly-box strong{color:#6366f1}
+.backend-box{background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);padding:1rem 1.2rem;margin-bottom:1rem;font-size:.78rem;color:var(--muted);line-height:1.7}
+.backend-box strong{color:#4ade80}
+.backend-status{font-family:var(--mono);font-size:.65rem;padding:.3rem .8rem;display:inline-flex;align-items:center;gap:.4rem}
+.backend-status.ok{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);color:#4ade80}
+.backend-status.fail{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:#f87171}
+.backend-status.checking{background:var(--gold-lo);border:1px solid rgba(201,168,76,.2);color:var(--gold)}
+.email-preview{background:var(--bg);border:1px solid var(--border2);padding:1.4rem;font-family:var(--mono);font-size:.78rem;line-height:1.9;color:var(--text);margin-top:.8rem;white-space:pre-wrap}
+body.light{--bg:#f9f7f2;--bg2:#f2efe8;--surface:#eae7de;--border:#dddad0;--border2:#c8c5ba;--text:#1a1814;--muted:#7a7568;--muted2:#c8c5b8;--gold-lo:rgba(138,96,0,.07);--blue-lo:rgba(96,165,250,.05)}
+@media(max-width:768px){.topbar,.main{padding:1rem 1.5rem}.two-col,.stats-row{grid-template-columns:1fr}}
+
+.type-selector{display:grid;grid-template-columns:1fr 1fr;gap:1px;border:1px solid var(--border);overflow:hidden;margin-bottom:1.2rem}
+.type-btn{padding:1.2rem;background:var(--bg2);cursor:pointer;transition:background .2s;border:none;color:var(--text);text-align:left;display:flex;flex-direction:column;gap:.4rem}
+.type-btn:hover{background:var(--surface)}
+.type-btn-title{font-family:var(--serif);font-size:1rem}
+.type-btn-desc{font-size:.72rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="#">
+    <div class="brand-av">A</div>
+    <span class="brand-name">Carty Visuals <span>· Connector OS</span></span>
+  </a>
+  <div style="display:flex;gap:.8rem;align-items:center;flex-wrap:wrap">
+    <span id="backend-status" class="backend-status fail">✗ Backend not connected</span>
+    <span class="badge">Nigeria · Signal Engine v1.0</span>
+    <button class="btn btn-ghost" onclick="document.body.classList.toggle('light')" style="padding:.4rem .9rem;font-size:.55rem">Light/Dark</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="steps-header">
+    <button class="step-tab active" onclick="goStep(1)" id="tab1"><div class="step-num">1</div><span class="step-label">Upload CSV</span></button>
+    <button class="step-tab" onclick="goStep(2)" id="tab2"><div class="step-num">2</div><span class="step-label">Configure</span></button>
+    <button class="step-tab" onclick="goStep(3)" id="tab3"><div class="step-num">3</div><span class="step-label">Fetch Signals</span></button>
+    <button class="step-tab" onclick="goStep(4)" id="tab4"><div class="step-num">4</div><span class="step-label">Generate</span></button>
+    <button class="step-tab" onclick="goStep(5)" id="tab5"><div class="step-num">5</div><span class="step-label">Push to Instantly</span></button>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="panel active" id="panel1">
+    <div class="section-head"><span class="section-title">Contact Type</span><div class="section-line"></div></div>
+    <div class="type-selector">
+      <button class="type-btn selected" id="type-corporate" onclick="selectType('investor')">
+        <span class="type-btn-label">Supply Side</span>
+        <span class="type-btn-title">Investors</span>
+        <span class="type-btn-desc">Family offices, fund managers, HNW deploying into real estate</span>
+      </button>
+      <button class="type-btn" id="type-hospitality" onclick="selectType('developer')">
+        <span class="type-btn-label">Demand Side</span>
+        <span class="type-btn-title">Developers</span>
+        <span class="type-btn-desc">Operators and syndicators actively raising capital</span>
+      </button>
+    </div>
+    <div class="section-head"><span class="section-title">Upload CSV from Apollo</span><div class="section-line"></div></div>
+    <div class="info-box"><strong>Expected columns:</strong> First Name, Last Name, Email, Company, Title, LinkedIn URL, Location. All columns preserved in export.</div>
+    <div class="card">
+      <div class="upload-zone" ondrop="handleDrop(event)" ondragover="ev(event)" ondragleave="dl()">
+        <input type="file" accept=".csv" onchange="handleFile(event)"/>
+        <div class="upload-icon">&#128196;</div>
+        <div class="upload-title">Drop your Apollo CSV here</div>
+        <div class="upload-desc">or click to browse</div>
+      </div>
+    </div>
+    <div id="preview-section" style="display:none">
+      <div class="stats-row">
+        <div class="stat-box"><span class="stat-val" id="s-total">0</span><span class="stat-label">Contacts</span></div>
+        <div class="stat-box"><span class="stat-val" id="s-emails">0</span><span class="stat-label">With Email</span></div>
+        <div class="stat-box"><span class="stat-val" id="s-linkedin">0</span><span class="stat-label">With LinkedIn</span></div>
+        <div class="stat-box"><span class="stat-val" id="s-type">&#8212;</span><span class="stat-label">Type</span></div>
+      </div>
+      <div class="table-wrap" style="max-height:220px;overflow-y:auto"><table class="data-table" id="preview-table"></table></div>
+      <div style="margin-top:1rem;display:flex;justify-content:flex-end">
+        <button class="btn btn-primary" onclick="goStep(2)">Continue &#8594;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="panel" id="panel2">
+    <div class="section-head"><span class="section-title">Backend & API Keys</span><div class="section-line"></div></div>
+    <div class="card">
+      <div class="card-title">Your Vercel Backend URL</div>
+      <div class="card-desc">All API calls go through your backend to avoid CORS issues. Deploy the backend folder to Vercel first, then paste the URL here.</div>
+      <div class="backend-box"><strong>How to deploy:</strong> Upload the peakprocai-backend folder to GitHub → connect to Vercel → deploy. Your URL will be like https://peakprocai-backend.vercel.app</div>
+      <div style="display:flex;gap:.8rem;align-items:flex-end">
+        <div class="field-group" style="flex:1;margin-bottom:0">
+          <label class="field-label">Backend URL</label>
+          <input class="field-input" id="backend-url" placeholder="https://your-backend.vercel.app" oninput="updateBackendStatus('fail','Not tested yet')"/>
+        </div>
+        <button class="btn btn-ghost" onclick="testBackendConnection()" style="padding:.7rem 1.2rem;font-size:.6rem;flex-shrink:0">Test Connection</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">API Keys</div>
+      <div class="card-desc">Keys are sent to your backend only — never stored anywhere.</div>
+      <div class="two-col">
+        <div class="field-group">
+          <label class="field-label">Apify API Token</label>
+          <input class="field-input" type="password" id="apify-key" placeholder="apify_api_..."/>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Posts per profile</label>
+          <select class="field-input" id="apify-posts">
+            <option value="1">1 post (fastest)</option>
+            <option value="2">2 posts</option>
+            <option value="3">3 posts (best signal)</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Anthropic API Key</label>
+        <input class="field-input" type="password" id="anthropic-key" placeholder="sk-ant-..."/>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Instantly Campaign IDs</div>
+      <div class="instantly-box"><strong>Find your Campaign ID:</strong> Instantly → click your campaign → copy the ID from the URL after /campaign/</div>
+      <div class="field-group">
+        <label class="field-label">Instantly API Key</label>
+        <input class="field-input" type="password" id="instantly-key" placeholder="your-instantly-api-key"/>
+      </div>
+      <div class="two-col">
+        <div class="field-group">
+          <label class="field-label">Investor Campaign ID</label>
+          <input class="field-input" id="investor-cid" placeholder="campaign_id_investors"/>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Developer Campaign ID</label>
+          <input class="field-input" id="developer-cid" placeholder="campaign_id_developers"/>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Email Template</div>
+      <div class="field-group"><label class="field-label">Subject</label><input class="field-input" id="subj" oninput="updatePreview()"/></div>
+      <div class="field-group"><label class="field-label">Line 2 — Value line</label><input class="field-input" id="line2" oninput="updatePreview()"/></div>
+      <div class="field-group"><label class="field-label">Line 3 — CTA</label><input class="field-input" id="line3" oninput="updatePreview()"/></div>
+      <div class="field-group"><label class="field-label">Sign-off</label><input class="field-input" id="signoff" value="Best,&#10;Ayomide" oninput="updatePreview()"/></div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.8rem">
+        <button class="btn btn-ghost" onclick="loadInvestorTpl()" style="font-size:.58rem;padding:.5rem 1rem">Investor Template</button>
+        <button class="btn btn-ghost" onclick="loadDeveloperTpl()" style="font-size:.58rem;padding:.5rem 1rem">Developer Template</button>
+      </div>
+      <div class="email-preview" id="email-preview" style="margin-top:.8rem"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:1rem">
+      <button class="btn btn-ghost" onclick="goStep(1)">&larr; Back</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Fetch Signals &#8594;</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="panel" id="panel3">
+    <div class="section-head"><span class="section-title">Phase 1 — LinkedIn Signal Fetching</span><div class="section-line"></div></div>
+    <div class="apify-box"><strong>What is happening:</strong> Your backend calls Apify to scrape recent LinkedIn posts for each contact. Claude then reads those posts to identify timing signals.</div>
+    <div class="stats-row">
+      <div class="stat-box"><span class="stat-val" id="f-total">0</span><span class="stat-label">Total</span></div>
+      <div class="stat-box"><span class="stat-val" id="f-done" style="color:#60a5fa">0</span><span class="stat-label">Posts Found</span></div>
+      <div class="stat-box"><span class="stat-val" id="f-nopost" style="color:var(--gold)">0</span><span class="stat-label">No Post</span></div>
+      <div class="stat-box"><span class="stat-val" id="f-err" style="color:#f87171">0</span><span class="stat-label">Errors</span></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="f-prog" style="width:0%;background:#60a5fa"></div></div>
+    <div class="progress-stats"><span id="f-label">Ready</span><span id="f-pct">0%</span></div>
+    <div class="log" id="fetch-log" style="margin:.8rem 0"><div class="li">Ready. Press Fetch Signals to begin.</div></div>
+    <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin:.8rem 0">
+      <button class="btn btn-primary" id="fetch-btn" onclick="runFetch()">&#9654; Fetch LinkedIn Signals</button>
+      <button class="btn btn-ghost" id="fetch-pause" onclick="toggleFetchPause()" style="display:none">&#9646;&#9646; Pause</button>
+      <button class="btn btn-ghost" onclick="skipFetch()" style="font-size:.6rem;padding:.6rem 1.2rem">Skip &#8594; Use CSV Data</button>
+    </div>
+    <div id="signals-section" style="display:none">
+      <div class="section-head"><span class="section-title">Signals Preview</span><div class="section-line"></div></div>
+      <div class="table-wrap" style="max-height:240px;overflow-y:auto"><table class="data-table" id="signals-table"></table></div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="panel" id="panel4">
+    <div class="section-head"><span class="section-title">Phase 2 — AI Personalisation</span><div class="section-line"></div></div>
+    <div class="info-box"><strong>What is happening:</strong> Claude reads each contact's LinkedIn post and generates a unique personalised first line based on their signal.</div>
+    <div class="stats-row">
+      <div class="stat-box"><span class="stat-val" id="g-total">0</span><span class="stat-label">Total</span></div>
+      <div class="stat-box"><span class="stat-val" id="g-done" style="color:#4ade80">0</span><span class="stat-label">Done</span></div>
+      <div class="stat-box"><span class="stat-val" id="g-err" style="color:#f87171">0</span><span class="stat-label">Errors</span></div>
+      <div class="stat-box"><span class="stat-val" id="g-rem" style="color:var(--gold)">0</span><span class="stat-label">Remaining</span></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="g-prog" style="width:0%"></div></div>
+    <div class="progress-stats"><span id="g-label">Ready</span><span id="g-pct">0%</span></div>
+    <div class="log" id="gen-log" style="margin:.8rem 0"><div class="li">Signal fetching complete. Press Generate to begin.</div></div>
+    <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin:.8rem 0">
+      <button class="btn btn-primary" id="gen-btn" onclick="runGeneration()">&#9654; Generate Emails</button>
+      <button class="btn btn-ghost" id="gen-pause" onclick="toggleGenPause()" style="display:none">&#9646;&#9646; Pause</button>
+    </div>
+    <div id="results-section" style="display:none">
+      <div class="section-head"><span class="section-title">Results Preview</span><div class="section-line"></div></div>
+      <div class="table-wrap" style="max-height:280px;overflow-y:auto"><table class="data-table" id="results-table"></table></div>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="panel" id="panel5">
+    <div class="section-head"><span class="section-title">Phase 3 — Push to Instantly</span><div class="section-line"></div></div>
+    <div class="instantly-box"><strong>What is happening:</strong> Each contact is pushed to your Instantly campaign with their personalised email already attached.</div>
+    <div class="stats-row">
+      <div class="stat-box"><span class="stat-val" id="p-total">0</span><span class="stat-label">Total</span></div>
+      <div class="stat-box"><span class="stat-val" id="p-done" style="color:#6366f1">0</span><span class="stat-label">Pushed</span></div>
+      <div class="stat-box"><span class="stat-val" id="p-err" style="color:#f87171">0</span><span class="stat-label">Errors</span></div>
+      <div class="stat-box"><span class="stat-val" id="p-rem" style="color:var(--gold)">0</span><span class="stat-label">Remaining</span></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="p-prog" style="width:0%;background:#6366f1"></div></div>
+    <div class="progress-stats"><span id="p-label">Ready</span><span id="p-pct">0%</span></div>
+    <div class="log" id="push-log" style="margin:.8rem 0"><div class="li">Generation complete. Press Push to send to Instantly.</div></div>
+    <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin:.8rem 0">
+      <button class="btn btn-instantly" id="push-btn" onclick="runPush()">&#8599; Push to Instantly</button>
+      <button class="btn btn-ghost" id="push-pause" onclick="togglePushPause()" style="display:none">&#9646;&#9646; Pause</button>
+      <button class="btn btn-green" onclick="doExport()">&#8595; Export CSV Backup</button>
+    </div>
+    <div id="push-section" style="display:none">
+      <div class="table-wrap" style="max-height:260px;overflow-y:auto"><table class="data-table" id="push-table"></table></div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+// ── BACKEND PROXY HELPERS ──────────────────────────────────────────────────
+function getBackend(){return (document.getElementById('backend-url')?.value||'').replace(/\/$/,'');}
+
+async function callAnthropic(apiKey,{model,max_tokens,system,messages}){
+  const url=getBackend();
+  const resp=await fetch(`${url}/api/anthropic`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({apiKey,model,max_tokens,system,messages})});
+  if(!resp.ok){const e=await resp.json();throw new Error(e.error?.message||e.error||`HTTP ${resp.status}`);}
+  return resp.json();
+}
+
+async function apifyStartRun(apifyKey,actorId,input){
+  const url=getBackend();
+  const resp=await fetch(`${url}/api/apify-start`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({apifyKey,actorId,input})});
+  if(!resp.ok){const e=await resp.json();throw new Error(e.error||`Apify start failed`);}
+  const data=await resp.json();
+  return data.data?.id;
+}
+
+async function apifyCheckStatus(apifyKey,runId){
+  const url=getBackend();
+  const resp=await fetch(`${url}/api/apify-status`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({apifyKey,runId})});
+  const data=await resp.json();
+  return data.data?.status;
+}
+
+async function apifyGetResults(apifyKey,runId,limit){
+  const url=getBackend();
+  const resp=await fetch(`${url}/api/apify-results`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({apifyKey,runId,limit:limit||3})});
+  return resp.json();
+}
+
+async function fetchLinkedInPost(apifyKey,profileUrl,numPosts,actorId){
+  const runId=await apifyStartRun(apifyKey,actorId||'apify~linkedin-post-search',{profileUrls:[profileUrl],maxPostsPerProfile:numPosts,proxy:{useApifyProxy:true}});
+  if(!runId)throw new Error('No run ID from Apify');
+  let attempts=0;
+  while(attempts<25){
+    await new Promise(r=>setTimeout(r,3000));
+    const status=await apifyCheckStatus(apifyKey,runId);
+    if(status==='SUCCEEDED')break;
+    if(['FAILED','ABORTED'].includes(status))throw new Error(`Apify run ${status}`);
+    attempts++;
+  }
+  const items=await apifyGetResults(apifyKey,runId,3);
+  if(!items?.length)return'';
+  return items.map(i=>i.text||i.content||i.description||'').filter(Boolean).join(' | ').substring(0,500);
+}
+
+async function pushInstantly(payload){
+  const url=getBackend();
+  const resp=await fetch(`${url}/api/instantly`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({payload})});
+  if(!resp.ok){const e=await resp.json();throw new Error(e.message||e.error||`HTTP ${resp.status}`);}
+  return resp.json();
+}
+
+async function fetchPageSpeed(apiKey,storeUrl){
+  const url=getBackend();
+  const resp=await fetch(`${url}/api/pagespeed`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({apiKey,url:storeUrl,strategy:'mobile'})});
+  if(!resp.ok){const e=await resp.json();throw new Error(e.error||`PageSpeed failed`);}
+  return resp.json();
+}
+
+async function testBackendConnection(){
+  const url=getBackend();
+  if(!url){updateBackendStatus('fail','No backend URL entered');return false;}
+  updateBackendStatus('checking','Testing connection...');
+  try{
+    const resp=await fetch(`${url}/api/health`);
+    if(resp.ok){updateBackendStatus('ok','Backend connected');return true;}
+    else{updateBackendStatus('fail','Backend not responding');return false;}
+  }catch(e){updateBackendStatus('fail','Cannot reach backend — check URL');return false;}
+}
+
+function updateBackendStatus(type,msg){
+  const el=document.getElementById('backend-status');
+  if(!el)return;
+  el.className=`backend-status ${type}`;
+  el.textContent=type==='ok'?'✓ '+msg:type==='fail'?'✗ '+msg:'⋯ '+msg;
+}
+
+// ── CSV HELPERS ────────────────────────────────────────────────────────────
+function parseCSV(text){
+  const lines=text.trim().split('\n');if(lines.length<2)return{headers:[],contacts:[]};
+  const parseRow=line=>{const result=[];let cur='';let inQ=false;for(let i=0;i<line.length;i++){if(line[i]==='"'){inQ=!inQ;}else if(line[i]===','&&!inQ){result.push(cur.trim());cur='';}else cur+=line[i];}result.push(cur.trim());return result;};
+  const headers=parseRow(lines[0]);
+  const contacts=lines.slice(1).filter(l=>l.trim()).map(line=>{const vals=parseRow(line);const obj={};headers.forEach((h,i)=>obj[h]=vals[i]||'');return obj;});
+  return{headers,contacts};
+}
+
+function gF(c,keys){for(const k of keys){const f=Object.keys(c).find(h=>h.toLowerCase()===k.toLowerCase());if(f&&c[f])return c[f];}return'';}
+function getFN(c){return gF(c,['first name','firstName','First Name','first_name'])||gF(c,['name','Name']).split(' ')[0]||'there';}
+function getLN(c){return gF(c,['last name','lastName','Last Name','last_name'])||'';}
+function getEM(c){return gF(c,['email','Email','EMAIL','email address']);}
+function getCO(c){return gF(c,['company','Company','company name','Company Name','organization']);}
+function getTI(c){return gF(c,['title','Title','job title','Job Title','position']);}
+function getLI(c){return gF(c,['linkedin url','LinkedIn URL','linkedin','LinkedIn','profileUrl','profile url']);}
+function getLO(c){return gF(c,['location','Location','city','City','state','State']);}
+function getIND(c){return gF(c,['industry','Industry','sector','Sector']);}
+function getSU(c){return gF(c,['store url','Store URL','website','Website','url','URL']);}
+
+// ── LOG HELPERS ────────────────────────────────────────────────────────────
+function addLog(logId,type,msg){
+  const el=document.getElementById(logId);if(!el)return;
+  const d=document.createElement('div');d.className=`l${type}`;
+  d.textContent=`[${new Date().toLocaleTimeString()}] ${msg}`;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+
+function incr(id){const el=document.getElementById(id);if(el)el.textContent=parseInt(el.textContent||0)+1;}
+
+function exportCSV(headers,results,extraKeys,extraLabels,filename){
+  const allCols=[...headers,...extraLabels];
+  const esc=v=>{if(!v)return'';const s=String(v).replace(/"/g,'""');return(s.includes(',')||s.includes('\n')||s.includes('"'))?`"${s}"`:s;};
+  const csv=[allCols.map(esc).join(','),...results.map(r=>[...headers.map(h=>esc(r[h]||'')), ...extraKeys.map(k=>esc(r[k]||''))].join(','))].join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=filename||'export.csv';a.click();
+  URL.revokeObjectURL(url);
+}
+
+function goStep(n){
+  document.querySelectorAll('.panel').forEach((p,i)=>p.classList.toggle('active',i===n-1));
+  document.querySelectorAll('.step-tab').forEach((t,i)=>{t.classList.remove('active');if(i===n-1)t.classList.add('active');});
+}
+
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let S={type:'investor',headers:[],contacts:[],results:[],fetchPaused:false,fetchRunning:false,fetchIdx:0,genPaused:false,genRunning:false,genIdx:0,pushPaused:false,pushRunning:false,pushIdx:0};
+
+function ev(e){e.preventDefault();document.querySelector('.upload-zone').classList.add('drag');}
+function dl(){document.querySelector('.upload-zone').classList.remove('drag');}
+function handleDrop(e){e.preventDefault();dl();processFile(e.dataTransfer.files[0]);}
+function handleFile(e){processFile(e.target.files[0]);}
+function processFile(file){
+  if(!file||!file.name.endsWith('.csv')){alert('Please upload a CSV file.');return;}
+  const r=new FileReader();r.onload=e=>loadCSV(e.target.result);r.readAsText(file);
+}
+function loadCSV(text){
+  const{headers,contacts}=parseCSV(text);
+  S.headers=headers;S.contacts=contacts;
+  document.getElementById('s-total').textContent=contacts.length;
+  document.getElementById('s-emails').textContent=contacts.filter(c=>getEM(c)).length;
+  document.getElementById('s-linkedin').textContent=contacts.filter(c=>getLI(c)).length;
+  document.getElementById('s-type').textContent=S.type==='investor'?'Investors':'Developers';
+  const cols=headers.slice(0,5);
+  document.getElementById('preview-table').innerHTML=
+    `<thead><tr>${cols.map(h=>`<th>${h}</th>`).join('')}</tr></thead>`+
+    `<tbody>${contacts.slice(0,8).map(r=>`<tr>${cols.map(h=>`<td>${r[h]||''}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  document.getElementById('preview-section').style.display='block';
+  loadDefaultTpl();
+}
+
+function selectType(t){
+  S.type=t;
+  ['investor','developer'].forEach(id=>document.getElementById('type-'+id).classList.remove('selected'));
+  document.getElementById('type-'+t).classList.add('selected');
+  document.getElementById('s-type').textContent=t==='investor'?'Investors':'Developers';
+  loadDefaultTpl();
+}
+
+function loadDefaultTpl(){if(S.type==='investor')loadInvestorTpl();else loadDeveloperTpl();}
+
+function loadInvestorTpl(){
+  document.getElementById('subj').value="Quick question re: your real estate thesis, {{FIRST_NAME}}";
+  document.getElementById('line2').value="I connect real estate investors with qualified deal flow through warm, double opt-in introductions — matched to your thesis, check size, and market.";
+  document.getElementById('line3').value="Worth a 15-minute conversation to see if there is a fit?";
+  document.getElementById('signoff').value="Best,\nAyomide";
+  updatePreview();
+}
+
+function loadDeveloperTpl(){
+  document.getElementById('subj').value="Investors for your raise, {{FIRST_NAME}}";
+  document.getElementById('line2').value="I connect real estate developers raising capital with investors actively deploying — through warm, double opt-in introductions matched to your raise size, asset class, and timeline.";
+  document.getElementById('line3').value="Worth a 15-minute conversation about your raise?";
+  document.getElementById('signoff').value="Best,\nAyomide";
+  updatePreview();
+}
+
+function updatePreview(){
+  const l2=document.getElementById('line2')?.value||'';
+  const l3=document.getElementById('line3')?.value||'';
+  const so=document.getElementById('signoff')?.value||'';
+  document.getElementById('email-preview').innerHTML=
+    `<span style="color:var(--gold);font-style:italic">[AI personalised line — unique per contact based on their LinkedIn post]</span>\n\n${l2}\n\n${l3}\n\n${so}`;
+}
+
+function buildEmail(line,c){
+  const l2=document.getElementById('line2').value;
+  const l3=document.getElementById('line3').value;
+  const so=document.getElementById('signoff').value;
+  return `${line}\n\n${l2}\n\n${l3}\n\n${so}`;
+}
+
+function buildSubj(c){
+  return document.getElementById('subj').value.replace(/{{FIRST_NAME}}/g,getFN(c)).replace(/{{COMPANY}}/g,getCO(c));
+}
+
+function buildStaticSignal(c){
+  let s='';
+  const t=getTI(c),co=getCO(c),lo=getLO(c);
+  if(t)s+=`Title: ${t}. `;if(co)s+=`Company: ${co}. `;if(lo)s+=`Location: ${lo}.`;
+  return s.trim();
+}
+
+// PHASE 1
+async function runFetch(){
+  const apifyKey=document.getElementById('apify-key').value.trim();
+  if(!apifyKey){alert('Please enter your Apify API token.');return;}
+  const ok=await testBackendConnection();
+  if(!ok){alert('Backend not connected. Please check your Vercel URL and try again.');return;}
+
+  S.results=S.contacts.map(c=>({...c,_post:'',_signal:'',_personalized:'',_subject:'',_body:'',_status:'pending',_pushed:false}));
+  S.fetchIdx=0;S.fetchPaused=false;S.fetchRunning=true;
+  const numPosts=parseInt(document.getElementById('apify-posts').value)||1;
+  document.getElementById('f-total').textContent=S.contacts.length;
+  ['f-done','f-nopost','f-err'].forEach(id=>document.getElementById(id).textContent='0');
+  document.getElementById('fetch-btn').style.display='none';
+  document.getElementById('fetch-pause').style.display='inline-flex';
+  document.getElementById('signals-section').style.display='block';
+  addLog('fetch-log','a',`Fetching signals for ${S.contacts.length} contacts via backend...`);
+  await nextFetch(apifyKey,numPosts);
+}
+
+async function nextFetch(apifyKey,numPosts){
+  if(!S.fetchRunning)return;
+  if(S.fetchPaused){setTimeout(()=>nextFetch(apifyKey,numPosts),500);return;}
+  if(S.fetchIdx>=S.contacts.length){finishFetch();return;}
+  const i=S.fetchIdx;const contact=S.contacts[i];const result=S.results[i];
+  const name=getFN(contact)+' '+getLN(contact);const liUrl=getLI(contact);
+  addLog('fetch-log','a',`[${i+1}/${S.contacts.length}] ${name.trim()}...`);
+  try{
+    if(!liUrl){result._signal=buildStaticSignal(contact);incr('f-nopost');addLog('fetch-log','w',`No LinkedIn URL for ${getFN(contact)} — using profile data`);}
+    else{
+      const post=await fetchLinkedInPost(apifyKey,liUrl,numPosts,'apify~linkedin-post-search');
+      result._post=post;result._signal=post||buildStaticSignal(contact);
+      if(post){incr('f-done');addLog('fetch-log','s',`Got post for ${getFN(contact)}: "${post.substring(0,55)}..."`)}
+      else{incr('f-nopost');addLog('fetch-log','w',`No post for ${getFN(contact)} — using profile data`);}
+    }
+  }catch(err){result._signal=buildStaticSignal(contact);incr('f-err');addLog('fetch-log','e',`Error: ${err.message}`);}
+  S.fetchIdx++;
+  const pct=Math.round((S.fetchIdx/S.contacts.length)*100);
+  document.getElementById('f-prog').style.width=pct+'%';
+  document.getElementById('f-pct').textContent=pct+'%';
+  document.getElementById('f-label').textContent=`Fetched ${S.fetchIdx} of ${S.contacts.length}`;
+  updateSignalsTable();
+  setTimeout(()=>nextFetch(apifyKey,numPosts),2000);
+}
+
+function finishFetch(){
+  S.fetchRunning=false;
+  addLog('fetch-log','s','Signal fetching complete!');
+  document.getElementById('fetch-pause').style.display='none';
+  const btn=document.getElementById('fetch-btn');
+  btn.textContent='Go to Generate';btn.style.display='inline-flex';
+  btn.onclick=()=>{goStep(4);document.getElementById('g-total').textContent=S.results.length;document.getElementById('g-rem').textContent=S.results.length;};
+  document.getElementById('tab3').classList.add('done');
+}
+
+function skipFetch(){
+  if(!S.contacts.length){alert('Upload a CSV first.');return;}
+  S.results=S.contacts.map(c=>({...c,_post:'',_signal:buildStaticSignal(c),_personalized:'',_subject:'',_body:'',_status:'pending',_pushed:false}));
+  addLog('fetch-log','w','Skipped Apify. Using CSV data as signal.');
+  goStep(4);document.getElementById('g-total').textContent=S.results.length;document.getElementById('g-rem').textContent=S.results.length;
+}
+
+function toggleFetchPause(){S.fetchPaused=!S.fetchPaused;document.getElementById('fetch-pause').textContent=S.fetchPaused?'Resume':'Pause';}
+
+function updateSignalsTable(){
+  const p=S.results.filter(r=>r._signal);if(!p.length)return;
+  document.getElementById('signals-table').innerHTML=
+    `<thead><tr><th>Name</th><th>Company</th><th>Signal / Post</th><th>Source</th></tr></thead>`+
+    `<tbody>${p.slice(-8).reverse().map(r=>`<tr><td>${getFN(r)} ${getLN(r)}</td><td>${getCO(r)}</td><td class="blue">${(r._post||r._signal||'').substring(0,90)}...</td><td style="color:${r._post?'#60a5fa':'var(--muted)'};font-size:.65rem">${r._post?'Live Post':'Profile'}</td></tr>`).join('')}</tbody>`;
+}
+
+// PHASE 2
+async function runGeneration(){
+  const key=document.getElementById('anthropic-key').value.trim();
+  if(!key){alert('Please enter your Anthropic API key.');return;}
+  S.genIdx=0;S.genPaused=false;S.genRunning=true;
+  document.getElementById('g-done').textContent='0';document.getElementById('g-err').textContent='0';
+  document.getElementById('gen-btn').style.display='none';document.getElementById('gen-pause').style.display='inline-flex';
+  document.getElementById('results-section').style.display='block';
+  addLog('gen-log','i',`Generating for ${S.results.length} contacts...`);
+  await nextGen(key);
+}
+
+async function nextGen(key){
+  if(!S.genRunning)return;
+  if(S.genPaused){setTimeout(()=>nextGen(key),500);return;}
+  if(S.genIdx>=S.results.length){finishGen();return;}
+  const i=S.genIdx;const result=S.results[i];const name=getFN(result);
+  addLog('gen-log','i',`[${i+1}/${S.results.length}] ${name} ${getLN(result)}...`);
+  try{
+    const hasPost=result._post&&result._post.length>10;
+    const system=S.type==='investor'
+      ?`You write personalised cold email opening lines for real estate investors. ONE sentence, max 20 words. ${hasPost?'Reference their recent LinkedIn post — show you read it.':'Reference their role or company.'} Do NOT mention PeakProCAI. Be direct and warm. Output ONLY the sentence.`
+      :`You write personalised cold email opening lines for real estate developers raising capital. ONE sentence, max 20 words. ${hasPost?'Reference their recent LinkedIn post.':'Reference their project or company.'} Do NOT mention PeakProCAI. Be direct and warm. Output ONLY the sentence.`;
+    const user=hasPost
+      ?`Their post: "${result._post}"\nName: ${name}, Company: ${getCO(result)}, Title: ${getTI(result)}\nWrite one personalised opening sentence.`
+      :`Name: ${name}, Company: ${getCO(result)}, Title: ${getTI(result)}, Location: ${getLO(result)}\nWrite one personalised opening sentence.`;
+    const data=await callAnthropic(key,{model:'claude-haiku-4-5-20251001',max_tokens:60,system,messages:[{role:'user',content:user}]});
+    const line=data.content[0].text.trim();
+    result._personalized=line;result._subject=buildSubj(result);result._body=buildEmail(line,result);result._status='done';
+    incr('g-done');addLog('gen-log','s',`OK ${name} — "${line.substring(0,55)}..."`);
+  }catch(err){
+    const fallback=`Hi ${name}, I came across your profile and thought there could be a strong fit.`;
+    result._personalized=fallback;result._subject=buildSubj(result);result._body=buildEmail(fallback,result);result._status='error';
+    incr('g-err');addLog('gen-log','e',`ERR ${name} — ${err.message}`);
+  }
+  S.genIdx++;
+  const done=parseInt(document.getElementById('g-done').textContent)+parseInt(document.getElementById('g-err').textContent);
+  const total=S.results.length;const pct=Math.round((done/total)*100);
+  document.getElementById('g-rem').textContent=total-done;
+  document.getElementById('g-prog').style.width=pct+'%';document.getElementById('g-pct').textContent=pct+'%';
+  document.getElementById('g-label').textContent=`Processing ${done} of ${total}`;
+  updateResultsTable();
+  setTimeout(()=>nextGen(key),1500);
+}
+
+function finishGen(){
+  S.genRunning=false;
+  const done=S.results.filter(r=>r._status==='done').length;
+  addLog('gen-log','s',`Complete! ${done} emails generated.`);
+  document.getElementById('gen-pause').style.display='none';
+  const btn=document.getElementById('gen-btn');btn.textContent='Push to Instantly';btn.style.display='inline-flex';btn.className='btn btn-instantly';
+  btn.onclick=()=>{goStep(5);const ts=S.results.filter(r=>r._status==='done');document.getElementById('p-total').textContent=ts.length;document.getElementById('p-rem').textContent=ts.length;};
+  document.getElementById('tab4').classList.add('done');
+}
+
+function toggleGenPause(){S.genPaused=!S.genPaused;document.getElementById('gen-pause').textContent=S.genPaused?'Resume':'Pause';}
+
+function updateResultsTable(){
+  const p=S.results.filter(r=>r._status!=='pending');if(!p.length)return;
+  document.getElementById('results-table').innerHTML=
+    `<thead><tr><th>Name</th><th>Company</th><th>Source</th><th>Personalised Line</th><th>Status</th></tr></thead>`+
+    `<tbody>${p.slice(-12).reverse().map(r=>`<tr><td>${getFN(r)} ${getLN(r)}</td><td>${getCO(r)}</td><td style="color:${r._post?'#60a5fa':'var(--muted)'};font-size:.65rem">${r._post?'Live Post':'Profile'}</td><td class="hi">${(r._personalized||'').substring(0,80)}...</td><td class="${r._status==='done'?'ok':'err'}">${r._status==='done'?'✓':'✗'}</td></tr>`).join('')}</tbody>`;
+}
+
+// PHASE 3
+async function runPush(){
+  const instKey=document.getElementById('instantly-key').value.trim();
+  const cid=S.type==='investor'?document.getElementById('investor-cid').value.trim():document.getElementById('developer-cid').value.trim();
+  if(!instKey){alert('Please enter your Instantly API key.');return;}
+  if(!cid){alert(`Please enter your ${S.type} campaign ID.`);return;}
+  const toSend=S.results.filter(r=>r._status==='done'&&!r._pushed);
+  if(!toSend.length){alert('No contacts to push.');return;}
+  S.pushIdx=0;S.pushPaused=false;S.pushRunning=true;
+  document.getElementById('p-done').textContent='0';document.getElementById('p-err').textContent='0';
+  document.getElementById('push-btn').style.display='none';document.getElementById('push-pause').style.display='inline-flex';
+  document.getElementById('push-section').style.display='block';
+  addLog('push-log','in',`Pushing ${toSend.length} contacts to Instantly...`);
+  await nextPush(instKey,cid,toSend);
+}
+
+async function nextPush(key,cid,toSend){
+  if(!S.pushRunning)return;
+  if(S.pushPaused){setTimeout(()=>nextPush(key,cid,toSend),500);return;}
+  if(S.pushIdx>=toSend.length){finishPush();return;}
+  const r=toSend[S.pushIdx];const name=getCO(r)||getFN(r);
+  addLog('push-log','in',`[${S.pushIdx+1}/${toSend.length}] ${name}...`);
+  try{
+    await pushInstantly({api_key:key,campaign_id:cid,email:getEM(r),first_name:getFN(r),last_name:getLN(r),company_name:getCO(r),personalization:r._personalized,custom_variables:{personalized_line:r._personalized,email_body:r._body,linkedin_post:r._post||''}});
+    r._pushed=true;incr('p-done');addLog('push-log','s',`Pushed ${name}`);
+  }catch(err){incr('p-err');addLog('push-log','e',`Error ${name}: ${err.message}`);}
+  S.pushIdx++;
+  const done=parseInt(document.getElementById('p-done').textContent)+parseInt(document.getElementById('p-err').textContent);
+  const pct=Math.round((done/toSend.length)*100);
+  document.getElementById('p-rem').textContent=toSend.length-done;
+  document.getElementById('p-prog').style.width=pct+'%';document.getElementById('p-pct').textContent=pct+'%';
+  updatePushTable(toSend);
+  setTimeout(()=>nextPush(key,cid,toSend),1000);
+}
+
+function finishPush(){
+  S.pushRunning=false;
+  addLog('push-log','s',`Done! Check your Instantly campaign.`);
+  document.getElementById('push-pause').style.display='none';
+  document.getElementById('push-btn').textContent='Push Complete ✓';document.getElementById('push-btn').style.display='inline-flex';document.getElementById('push-btn').disabled=true;
+  document.getElementById('tab5').classList.add('done');
+}
+
+function togglePushPause(){S.pushPaused=!S.pushPaused;document.getElementById('push-pause').textContent=S.pushPaused?'Resume':'Pause';}
+
+function updatePushTable(toSend){
+  document.getElementById('push-table').innerHTML=
+    `<thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Status</th></tr></thead>`+
+    `<tbody>${toSend.slice(0,S.pushIdx).slice(-12).reverse().map(r=>`<tr><td>${getFN(r)} ${getLN(r)}</td><td>${getCO(r)}</td><td>${getEM(r)}</td><td class="${r._pushed?'pushed':'err'}">${r._pushed?'Pushed ✓':'Error ✗'}</td></tr>`).join('')}</tbody>`;
+}
+
+function doExport(){
+  exportCSV(S.headers,S.results.filter(r=>r._status==='done'),['_post','_signal','_personalized','_subject','_body'],['LinkedIn_Post','Signal','Personalized_Line','Email_Subject','Email_Body'],`peakprocai-${S.type}s-${Date.now()}.csv`);
+}
+
+window.addEventListener('DOMContentLoaded',()=>{loadInvestorTpl();updatePreview();});
+</script>
+</body>
+</html>
